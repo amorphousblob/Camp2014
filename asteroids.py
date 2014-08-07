@@ -19,18 +19,33 @@ class Player(pygame.sprite.Sprite):
 		self.angle = 0
 		self.dx = 0
 		self.dy = 0
-		self.speed = 0
+		self.speed = 6
 		self.deg = 0
+		self.d_deg = 0
+		self.accel = 0
+		self.moveforward = False
 
 	def update(self):
-		print self.deg
-		self.angle = math.radians(self.deg)		
-		self.move()
+		self.deg += self.d_deg
+		#self.speed += self.accel
+		self.angle = math.radians(self.deg)
 		oldcenter = self.rect.center
 		self.rotate()
 		self.rect = self.image.get_rect()
 		self.rect.center = oldcenter
+		if self.moveforward == True:
+			self.move()
+		self.wrap()
 
+	def wrap(self):
+		if self.rect.x > WIDTH:
+			self.rect.x = 0
+		if self.rect.x < 0:
+			self.rect.x = WIDTH
+		if self.rect.y < 0:
+			self.rect.y = HEIGHT
+		if self.rect.y > HEIGHT:
+			self.rect.y = 0
 	def move(self):
 		self.rect.x += math.cos(self.angle) * self.speed
 		self.rect.y += math.sin(self.angle) * self.speed
@@ -62,12 +77,15 @@ class Bullet(pygame.sprite.Sprite):
 		self.rect.x += math.cos(self.angle) * self.speed
 		self.rect.y += math.sin(self.angle) * self.speed
 
+WIDTH = 640
+HEIGHT = 480
+
 pygame.init()
 pygame.font.init()
 
 font = pygame.font.Font(None, 36)
 
-size = (640, 480)
+size = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(size)
 
 enemies = pygame.sprite.Group()
@@ -96,11 +114,11 @@ while not done:
 			done = True
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_RIGHT:
-				player.deg += 5
+				player.d_deg = 5
 			if event.key == pygame.K_LEFT:
-				player.deg += -5
+				player.d_deg = -5
 			if event.key == pygame.K_UP:
-				player.speed += 2
+				player.moveforward = True
 			if event.key == pygame.K_SPACE:
 				bullet = Bullet()
 				bullet.rect.center = player.rect.center
@@ -109,11 +127,11 @@ while not done:
 				bullets.add(bullet)
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_RIGHT:
-				player.deg += 0
+				player.d_deg = 0
 			if event.key == pygame.K_LEFT:
-				player.deg += 0
+				player.d_deg = 0
 			if event.key == pygame.K_UP:
-				player.speed += -2
+				player.moveforward = False
 
 	for bullet in bullets:
 		bullet.update()
