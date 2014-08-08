@@ -1,6 +1,7 @@
 import pygame
 import math
 import random
+import time
 
 white = (255,255,255)
 black = (0,0,0)
@@ -19,7 +20,7 @@ class Player(pygame.sprite.Sprite):
 		self.angle = 0
 		self.dx = 0
 		self.dy = 0
-		self.speed = 6
+		self.speed = 5
 		self.deg = 0
 		self.d_deg = 0
 		self.accel = 0
@@ -60,6 +61,17 @@ class Enemy(pygame.sprite.Sprite):
 		self.image = pygame.Surface([width, height])
 		self.image.fill(red)
 		self.rect = self.image.get_rect()
+		self.speed  = 2
+	def wrap(self):
+		if self.rect.y < 0:
+			self.rect.y = HEIGHT
+		if self.rect.y > HEIGHT:
+			self.rect.y = 0
+	def update(self):
+		self.move()
+	def move(self):
+		self.rect.y += self.speed
+
 
 class Bullet(pygame.sprite.Sprite):
 	def __init__(self):
@@ -148,6 +160,8 @@ while not done:
 
 	player.update()
 
+	enemy.update()
+
 	hit_list = pygame.sprite.spritecollide(player, enemies, True)
 	for entity in hit_list:
 		score += 1
@@ -159,7 +173,15 @@ while not done:
 	textpos = [10, 10]
 	screen.blit(text, textpos)
 
+	timer = font.render("Score: "+str(pygame.time.get_ticks()), True, green)
+	timerpos = [480, 10]
+	screen.blit(timer, timerpos)
+
+
 	clock.tick(60)
 	pygame.display.flip()
 
+	if score == 30:
+		pygame.time.wait(3000)
+		pygame.quit()
 pygame.quit()

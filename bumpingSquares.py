@@ -27,6 +27,14 @@ class Square(pygame.sprite.Sprite):
 	def move(self):
 		self.rect.x += self.dx
 		self.rect.y += self.dy
+		if self.rect.right > 700:
+			self.dx *= -1
+		if self.rect.left < 0:
+			self.dx *= -1
+		if self.rect.top < 0:
+			self.dy *= -1
+		if self.rect.bottom > 900:
+			self.dy *= -1
 
 
 pygame.init()
@@ -102,7 +110,11 @@ while not(done):
 	dude.move()
 	dude2.move()
 	if pygame.sprite.groupcollide(dude_list, other_list, False, False):
-		if dude.rect.left < dude2.rect.right and dude.rect.top < dude2.rect.bottom:
+		dude.dx *= -1
+		dude2.dx *= -1
+		dude2.dy *= -1
+		dude.dy *= -1
+
 #DRAWING LOGIC
 	screen.fill(white)
 	dude_list.draw(screen)
